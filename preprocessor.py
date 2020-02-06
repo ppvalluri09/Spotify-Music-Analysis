@@ -11,9 +11,9 @@ def fetch_data():
 		for row in r:
 			names.append(row[1].lower())
 	names = names[1:]
-	API_ENDPOINT = 'https://api.spotify.com/v1/search?q={}&type=track'
+	API_ENDPOINT = 'https://api.spotify.com/v1/search?q={}&type=track&market=US&offset=5&limit=1'
 	headers = {'Accept': 'application/json', 'Content-Type': 'application/json',
-			   'Authorization': 'Bearer BQAW-q08I1aXkxZRQw08YSm2BYWseQz7NIrGhLkQW_78M7Oh5Pd1tVDswPlURa3Dd02ibGP2MpK-3Rqi8jqnR6AFdLqDqfs7oJTswPBB00nlukNpQzVn36y-nw6J2i_VHjLk0jbD-KIKDc5-qhfEdoNsWMeyoiCPOlyB9MOj1y1w6iIlEUdmD_Ev30GxK4q_x0d5J5xmMciZzmkxNmuP1xVRdPLQrmXZlDOk4c7ebQ'
+			   'Authorization': 'Bearer BQAKA8-RwDQip2YXVqQIZtAQveiHD_iIUEETmulDG9uIDIQ5A-0QC_y4UqKJTLKyiEC3fKPI0FI_lSmv45BW1VJN374ljwfDHIm3WHlor5SWDOuqwldcUHgpHWdv-iizYvzdRys5NaFNhk06VK6M0nkurHKZfoLmci4NTBMYtwmUe9L8kkmtA2taiR6bMb60uNDYnIxm0lH-dTFp2Yv_5-E5hHk7C4RFCSMlGIdWJQ'
 	}
 	if not os.path.isfile('data/spotify_data_big.csv'):
 		info = []
@@ -26,16 +26,29 @@ def fetch_data():
 		final_df = pd.DataFrame(info, columns = ['id', 'name', 'artist_name'])
 		final_df.to_csv('data/spotify_data_big.csv')
 
-	if not os.path.isfile('data/song_data_huge.csv'):
-		ids = pd.read_csv('data/spotify_data_big.csv', encoding='latin-1').iloc[:, 1].values.tolist()
+	if not os.path.isfile('data/spotify_data_small.csv'):
+		info = []
+		for name in names:
+			data = requests.get(API_ENDPOINT.format(name), headers=headers).json()
+			if len(data['tracks']['items']):
+				info.append([data['tracks']['items'][0]['id'], data['tracks']['items'][0]['name'], data['tracks']['items'][0]['artists'][0]['name']])
+			else:
+				names.pop(names.index(name))
+		final_df = pd.DataFrame(info, columns = ['id', 'name', 'artist_name'])
+		final_df.to_csv('data/spotify_data_small.csv')
+
+	if not os.path.isfile('data/song_data_small.csv'):
+		ids = pd.read_csv('data/spotify_data_small.csv', encoding='latin-1').iloc[:, 1].values.tolist()
 		API_ENDPOINT2 = 'https://api.spotify.com/v1/audio-features/{}'
 		df = pd.DataFrame(columns=['danceability', 'energy', 'loudness', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo'])
 		for ele in ids:
 			data = requests.get(API_ENDPOINT2.format(ele), headers=headers).json()
 			df = df.append({k: v for (k, v) in zip(data.keys(), data.values()) if k in df.columns}, ignore_index=True)
-		df['name'] = pd.read_csv('data/spotify_data_big.csv', encoding='latin-1')['name'].values.tolist()
-		df['artist_name'] = pd.read_csv('data/spotify_data_big.csv', encoding='latin-1')['artist'].values.tolist()
+		df['name'] = pd.read_csv('data/spotify_data_small.csv', encoding='latin-1')['name'].values.tolist()
+		df['artist_name'] = pd.read_csv('data/spotify_data_small.csv', encoding='latin-1')['artist_name'].values.tolist()
 		print(df.head())
+
+		df.to_csv('data/song_data_small.csv')
 			
 
 

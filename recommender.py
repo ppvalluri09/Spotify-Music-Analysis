@@ -8,4 +8,4 @@ import pickle
 
 brc = pickle.load(open('models/model.sav', 'rb'))
 
-# Need data for prediction
+# Need to extract data for prediction

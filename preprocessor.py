@@ -13,7 +13,7 @@ def fetch_data():
 	names = names[1:]
 	API_ENDPOINT = 'https://api.spotify.com/v1/search?q={}&type=track&market=US&offset=5&limit=1'
 	headers = {'Accept': 'application/json', 'Content-Type': 'application/json',
-			   'Authorization': 'Bearer BQAKA8-RwDQip2YXVqQIZtAQveiHD_iIUEETmulDG9uIDIQ5A-0QC_y4UqKJTLKyiEC3fKPI0FI_lSmv45BW1VJN374ljwfDHIm3WHlor5SWDOuqwldcUHgpHWdv-iizYvzdRys5NaFNhk06VK6M0nkurHKZfoLmci4NTBMYtwmUe9L8kkmtA2taiR6bMb60uNDYnIxm0lH-dTFp2Yv_5-E5hHk7C4RFCSMlGIdWJQ'
+			   'Authorization': 'Bearer YOUR_API_KEY_GOES_HERE'
 	}
 	if not os.path.isfile('data/spotify_data_big.csv'):
 		info = []
